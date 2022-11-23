@@ -5,7 +5,7 @@ const server: Application = express();
 server.use(json());
 server.use(urlencoded({ extended: false }));
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 
 server.use(routes);
 
