@@ -1,6 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { imageList, resizedImageList } from '../../utils/data';
-// import sharp from 'sharp';
+import { resizedImageList } from '../../utils/data';
 import { createResizedImage } from '../../utils/helperFunction';
 import { checkApi } from '../../utils/middelware/api';
 
@@ -9,66 +8,44 @@ import fs from 'fs';
 
 const imageRouter = Router();
 
-const output = path.resolve('./') + `/public/thumbnail/`;
+const output: string = path.resolve('./') + `/public/thumbnail/`;
 
-imageRouter.get('/', checkApi, async (req: Request, res: Response) => {
-  try {
-    const name = req.query.name as string;
+imageRouter.get(
+  '/',
+  checkApi,
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const name = req.query.name as string;
 
-    // if (!name) {
-    //   return res.status(404).send('must add Image name to URL ');
-    // }
+      const width = Number(req.query.width);
 
-    const width = Number(req.query.width);
+      const height = Number(req.query.height);
 
-    // if (!width) {
-    //   return res
-    //     .status(404)
-    //     .send('width is not found, you must add width to URL');
-    // }
+      const imagePath: string =
+        path.resolve('./') + `/public/images/${name}.jpg`;
 
-    const height = Number(req.query.height);
+      const resizedImageName = `${name}-${width}x${height}.jpg`;
 
-    // if (!height) {
-    //   return res
-    //     .status(404)
-    //     .send('height is not found, you must add height to URL');
-    // }
+      if (!fs.existsSync(output)) {
+        fs.mkdirSync(output);
+      }
 
-    const imagePath = path.resolve('./') + `/public/images/${name}.jpg`;
+      const resizedImagePath: string = output + resizedImageName;
 
-    // if (fs.existsSync(imagePath) === false) {
-    //   return res.status(404).send('image is not found');
-    // }
+      if (resizedImageList.includes(resizedImageName)) {
+        return res.status(200).sendFile(resizedImagePath);
+      }
 
-    // const image = imageList.includes(name);
-    // if (image === false) {
-    //   return res.status(404).send('image is not found');
-    // }
+      await createResizedImage(imagePath, width, height, resizedImagePath);
 
-    const resizedImageName = `${name}-${width}x${height}.jpg`;
+      resizedImageList.push(resizedImageName);
 
-    if (!fs.existsSync(output)) {
-      fs.mkdirSync(output);
+      res.status(200).sendFile(resizedImagePath);
+    } catch (error) {
+      console.log(error);
+      res.status(500).send(error);
     }
-
-    const resizedImagePath = output + resizedImageName;
-
-    if (resizedImageList.includes(resizedImageName)) {
-      return res.status(200).sendFile(resizedImagePath);
-    }
-
-    // await sharp(imagePath).resize(width, height).toFile(resizedImagePath);
-
-    await createResizedImage(imagePath, width, height, resizedImagePath);
-
-    resizedImageList.push(resizedImageName);
-
-    res.status(200).sendFile(resizedImagePath);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send(error);
   }
-});
+);
 
 export default imageRouter;

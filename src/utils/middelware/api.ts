@@ -1,7 +1,11 @@
-import { RequestHandler } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { imageList } from '../data';
 
-export const checkApi: RequestHandler = async (req, res, next) => {
+export const checkApi = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void | Response> => {
   const name = req.query.name as string;
   const width = Number(req.query.width);
   const height = Number(req.query.height);

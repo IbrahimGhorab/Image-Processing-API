@@ -5,8 +5,7 @@ module.exports = {
     node: true,
   },
   extends: [
-    'eslint:recommended',
-    'plugin:react/recommended',
+    'eslint:recommended',    
     'plugin:@typescript-eslint/recommended',
   ],
   overrides: [],
@@ -16,7 +15,5 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: ['prettier', '@typescript-eslint'],
-  rules: {
-    'prettier/prettier': 1,
-  },
+  rules: {},
 };
